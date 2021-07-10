@@ -1,12 +1,12 @@
 const Generator = require("yeoman-generator");
-
+const Git = require("nodegit");
 module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
   }
 
   async prompting() {
-    const answers = await this.prompt([
+    this.answers = await this.prompt([
       {
         type: "input",
         name: "name",
@@ -14,16 +14,49 @@ module.exports = class extends Generator {
         default: this.appname,
       },
       {
-        type: "confirm",
-        name: "cool",
-        message: "Would you like to enable the Cool feature?",
+        type: "list",
+        name: "repo",
+        message: "Select a template to start with",
+        choices: [
+          {
+            name: "NodeJS template",
+            value: "template-node-js",
+          },
+          {
+            name: "NodeJS template with Typescript",
+            value: "template-node-ts",
+          },
+          {
+            name: "Gatsby template with Typescript",
+            value: "template-gatsby-ts",
+          },
+        ],
       },
     ]);
-    this.log("app name", answers.name);
-    this.log("cool feature", answers.cool);
   }
 
-  writing() {
-    // this.log("cool feature", this.answers.cool);
+  _gitClone(info, destination) {
+    const { user, repo } = info;
+    if (!user || !repo) throw new Error("username and repo are required");
+    const url = `https://github.com/${user}/${repo}`;
+    return Git.Clone(url, destination);
+  }
+
+  async writing() {
+    if (!this.answers.repo) throw new Error("no template repo specified!");
+
+    try {
+      await this._gitClone(
+        { user: "bruceeewong", repo: this.answers.repo },
+        this.destinationRoot()
+      );
+      this.log("git clone succeed:");
+    } catch (e) {
+      this.log("git clone failed: " + e.message);
+    }
+  }
+
+  end() {
+    this.log("happy hacking ;)");
   }
 };

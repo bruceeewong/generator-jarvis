@@ -14,7 +14,7 @@
   ],
   "author": "Bruski <bruskiwang@outlook.com>",
   "license": "MIT",
-  "main": "index.js", 
+  "main": "index.js",
   "files": [
     "generators"
   ],
@@ -27,23 +27,23 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "nodegit": "^0.27.0",
     "yeoman-generator": "^5.3.0"
   },
   "devDependencies": {
-    "prettier": "^2.3.2",
-    "eslint": "^7.29.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^3.4.0",
-    "eslint-plugin-jest": "^24.3.6",
-    "jest": "^27.0.6",
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
     "commitizen": "^4.2.4",
     "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^7.29.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-prettier": "^3.4.0",
     "husky": "^6.0.0",
-    "lint-staged": "^11.0.0"
+    "jest": "^27.0.6",
+    "lint-staged": "^11.0.0",
+    "prettier": "^2.3.2"
   },
-
   "lint-staged": {
     "*.js": "npm run lint:fix",
     "*.{js,md,json}": "npm run prettier"
