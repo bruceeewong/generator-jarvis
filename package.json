@@ -1,7 +1,7 @@
 {
   "name": "generator-jarvis",
   "version": "0.0.1",
-  "description": "Create any code template you want, sir.",
+  "description": "Create code from templates for you, sir.",
   "repository": {
     "url": "https://github.com/bruceeewong/generator-jarvis",
     "type": "github"
@@ -14,20 +14,23 @@
   ],
   "author": "Bruski <bruskiwang@outlook.com>",
   "license": "MIT",
-  "main": "index.js",
+  "main": "generators/index.js",
   "files": [
     "generators"
   ],
   "scripts": {
     "test": "jest",
-    "cz": "cz",
+    "commit": "cz",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "prettier": "prettier --write --ignore-unknown .",
     "prepare": "husky install"
   },
   "dependencies": {
+    "chalk": "^4.1.1",
+    "lodash": "^4.17.21",
     "nodegit": "^0.27.0",
+    "rimraf": "^3.0.2",
     "yeoman-generator": "^5.3.0"
   },
   "devDependencies": {
