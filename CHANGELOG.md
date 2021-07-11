@@ -1,4 +1,8 @@
-# 0.1.0 (2021-07-11)
+## [0.1.1](https://github.com/bruceeewong/generator-jarvis/compare/v0.1.0...v0.1.1) (2021-07-11)
+
+
+
+# [0.1.0](https://github.com/bruceeewong/generator-jarvis/compare/bc232ad8f6a0857e98045d9e808263d9c3815629...v0.1.0) (2021-07-11)
 
 
 ### Features
