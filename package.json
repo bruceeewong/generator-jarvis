@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "chalk": "^4.1.1",
+    "cross-spawn": "^7.0.3",
     "lodash": "^4.17.21",
     "nodegit": "^0.27.0",
     "rimraf": "^3.0.2",

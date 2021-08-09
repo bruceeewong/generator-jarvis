@@ -1,4 +1,5 @@
 const Generator = require("yeoman-generator");
+const spawn = require("cross-spawn");
 const Git = require("nodegit");
 const chalk = require("chalk");
 const rimraf = require("rimraf");
@@ -55,15 +56,13 @@ module.exports = class JarvisGenerator extends ChalkGenerator {
         type: "input",
         name: "author",
         message: "May I know your name, please?",
-        when: () => {
-          return !this.git.name();
-        },
+        when: () => !this.git.name(),
         default: this.git.name(),
       },
       {
         type: "list",
         name: "repo",
-        message: "Select a template to start with",
+        message: "Select a template / cli to start with",
         choices: [
           {
             name: "NodeJS template",
@@ -72,6 +71,10 @@ module.exports = class JarvisGenerator extends ChalkGenerator {
           {
             name: "NodeJS template with Typescript",
             value: "template-node-ts",
+          },
+          {
+            name: "Umi CLI",
+            value: "cli/umi",
           },
           {
             name: "Gatsby template with Typescript",
@@ -83,12 +86,14 @@ module.exports = class JarvisGenerator extends ChalkGenerator {
         type: "confirm",
         name: "shouldNewDir",
         message: "Should I create a new directory here?",
+        when: (answers) => answers.repo.startsWith("template"),
         default: true,
       },
       {
         type: "confirm",
         name: "needInstall",
         message: "Should I install npm dependencies?",
+        when: (answers) => answers.repo.startsWith("template"),
         default: true,
       },
       {
@@ -113,20 +118,31 @@ module.exports = class JarvisGenerator extends ChalkGenerator {
       ...answers,
       author: answers.author || this.git.name(),
     };
+    this._setMode(answers.repo);
   }
 
   async writing() {
     if (!this.answers.repo) throw new Error("no template repo specified!");
-
-    this._setDestination(this.answers.name, this.answers.shouldNewDir);
-    await this._cloneFromGit();
-    await this._handleTemplates();
-    this._cleanAfterHandleTemplates();
+    const { repo } = this.answers;
+    if (this._isMode("cli")) {
+      const cliName = JarvisGenerator.getCliName(repo);
+      spawn.sync("npx", [`create-${cliName}`, this.answers.name], {
+        stdio: "inherit",
+      });
+    } else {
+      // template is default
+      this._setDestination(this.answers.name, this.answers.shouldNewDir);
+      await this._cloneFromGit();
+      await this._handleTemplates();
+      this._cleanAfterHandleTemplates();
+    }
   }
 
   install() {
-    if (!this.answers.needInstall) return;
-    this._installDependencies(this.answers.installBy);
+    if (this._isMode("template")) {
+      if (!this.answers.needInstall) return;
+      this._installDependencies(this.answers.installBy);
+    }
   }
 
   end() {
@@ -230,10 +246,36 @@ module.exports = class JarvisGenerator extends ChalkGenerator {
     }
   }
 
+  _setMode(repo) {
+    const valid = ["template", "cli"];
+    let mode;
+    for (let i = 0, len = valid.length; i < len; ++i) {
+      const value = valid[i];
+      if (repo.startsWith(value)) {
+        mode = value;
+        break;
+      }
+    }
+    if (!mode) return;
+
+    this.answers = {
+      ...this.answers,
+      mode,
+    };
+  }
+  _isMode(mode) {
+    return this.answers.mode === mode;
+  }
+
   static gitClone(info, destination) {
     const { user, repo } = info;
     if (!user || !repo) throw new Error("username and repo are required");
     const url = `https://github.com/${user}/${repo}`;
     return Git.Clone(url, destination);
+  }
+
+  static getCliName(repo = "") {
+    // slice string like cli/xxx -> xxx
+    return repo.slice(4);
   }
 };
